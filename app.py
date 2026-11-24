@@ -20,11 +20,11 @@ dyspnea_care = [
     ["의복 느슨하게 하기", "중", "목과 가슴 부위의 조이는 옷 풀어주기"]
 ]
 
-# 2. 함수 (def): 증상과 체온을 매개변수로 받아 위험도 점수와 안내 문구 리턴
+# 2. 함수 (def): 체온과 증상을 논리적으로 판별하여 위험도 점수와 안내 문구 리턴
 def check_vital(symptom, temp):
     risk_score = 40  # 기본 정상 위험도 점수
     
-    # 3. 조건문 (if-elif-else): 체온(temp) 자체의 정상/비정상 범위를 먼저 판단
+    # (1) 체온(temp) 자체의 정상/비정상 범위를 먼저 판단
     if temp < 36.0:
         risk_score += 20
         temp_status = "저체온 주의(36.0°C 미만)"
@@ -37,12 +37,9 @@ def check_vital(symptom, temp):
     else:
         temp_status = "정상 체온 범위(36.0~37.4°C)"
 
-    # 선택한 주요 증상에 따른 추가 위험도 및 안내 문구 조합
+    # (2) 선택한 주요 증상과 체온을 종합하여 위험도 및 안내 문구 결정
     if symptom == "고열":
         if temp < 37.5:
-            message = f"ℹ️ 현재 체온은 {temp}°C({temp_status})로, 고열 상태가 아닙니다. 체온을 다시 확인하세요."
+            message = f"ℹ️ 현재 체온은 {temp}°C({temp_status})로, 고열 상태가 아닙니다. 체온과 증상을 다시 확인하세요."
         elif temp >= 38.5:
-            risk_score += 15
-            message = f"⚠️ {temp_status}입니다. 즉각적인 체온 조절 간호 중재가 필요합니다."
-        else:
-            message = f"현재
+            risk_
