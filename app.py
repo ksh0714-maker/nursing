@@ -1,30 +1,7 @@
-import streamlit as st
-import pandas as pd
-
-# 1. 데이터 구조 (리스트): 증상별 필수 간호 중재 목록 정의
-fever_care = [
-    ["미온수 마사지", "상", "겨드랑이·사타구니 위주 닦아주기"],
-    ["수분 섭취 권장", "중", "탈수 예방을 위한 미지근한 물 공급"],
-    ["해열제 투여 확인", "하", "의사 처방에 따른 정량 투약 여부 확인"]
-]
-
-hypotension_care = [
-    ["하지 거상 체위", "상", "누운 상태에서 다리를 심장보다 높게 올리기"],
-    ["활력징후 재측정", "상", "5~10분 간격으로 혈압 및 맥박 변화 관찰"],
-    ["수액 공급 준비", "중", "정맥 주사 경로 확보 및 의료진 보고"]
-]
-
-dyspnea_care = [
-    ["반좌위(파울러씨 체위)", "상", "상체를 45~60도 세워 폐 확장 돕기"],
-    ["산소포화도 측정", "상", "맥박산소측정기로 SpO2 수치 확인"],
-    ["의복 느슨하게 하기", "중", "목과 가슴 부위의 조이는 옷 풀어주기"]
-]
-
-# 2. 함수 (def): 체온과 증상을 논리적으로 판별하여 위험도 점수와 안내 문구 리턴
 def check_vital(symptom, temp):
     risk_score = 40  # 기본 정상 위험도 점수
     
-    # (1) 체온(temp) 자체의 정상/비정상 범위를 먼저 판단
+    # 1) 체온(temp) 자체의 정상/비정상 범위를 먼저 판단
     if temp < 36.0:
         risk_score += 20
         temp_status = "저체온 주의(36.0°C 미만)"
@@ -37,9 +14,30 @@ def check_vital(symptom, temp):
     else:
         temp_status = "정상 체온 범위(36.0~37.4°C)"
 
-    # (2) 선택한 주요 증상과 체온을 종합하여 위험도 및 안내 문구 결정
+    # 2) 선택한 주요 증상에 따른 추가 위험도 및 안내 문구 조합
     if symptom == "고열":
         if temp < 37.5:
-            message = f"ℹ️ 현재 체온은 {temp}°C({temp_status})로, 고열 상태가 아닙니다. 체온과 증상을 다시 확인하세요."
+            message = f"ℹ️ 현재 체온은 {temp}°C({temp_status})로, 고열 상태가 아닙니다. 체온을 다시 확인하세요."
         elif temp >= 38.5:
-            risk_
+            risk_score += 15
+            message = f"⚠️ {temp_status}입니다. 즉각적인 체온 조절 간호 중재가 필요합니다."
+        else:
+            message = f"현재 {temp_status}입니다. 주기적인 체온 관찰이 필요합니다."
+            
+    elif symptom == "저혈압":
+        risk_score += 20
+        if temp < 36.0:
+            risk_score += 15
+            message = f"⚠️ 저혈압과 {temp_status}이 동반되었습니다. 쇼크 예방을 위한 즉각 조치가 필요합니다."
+        else:
+            message = f"혈압 저하가 감지되었습니다. ({temp_status}) 체위 변경 및 지속적인 혈압 모니터링이 필요합니다."
+            
+    else:  # 호흡곤란
+        risk_score += 25
+        if temp >= 38.0:
+            risk_score += 15
+            message = f"⚠️ 발열을 동반한 호흡곤란({temp_status})입니다. 기도 확보 및 산소 공급이 시급합니다."
+        else:
+            message = f"호흡곤란 증상이 있습니다. ({temp_status}) 상체를 높여주고 호흡 양상을 관찰하세요."
+            
+    return risk_score, message
